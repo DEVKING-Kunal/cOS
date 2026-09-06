@@ -1,4 +1,4 @@
-# cOS (Curiosity Operating System): The Comprehensive Systems Engineering Textbook
+# cOS (Curiosity Operating System) : Guide
 
 
 **Architecture**: 64-bit RISC-V (`rv64gc`) on QEMU `virt` machine  
