@@ -298,13 +298,3 @@ cOS provides multitasking and fair CPU allocation across multiple cores:
 
 ---
 
-## 4. How to Render and Validate This Diagram
-
-This file uses GitHub-flavored and Antigravity-native **Mermaid.js** syntax.
-1. **In Markdown Viewers (Antigravity IDE, VS Code, GitHub)**:
-   - The ` ```mermaid ` blocks will automatically parse and render interactive vector graphics.
-2. **Command Line Validation (mermaid-cli)**:
-   ```bash
-   npx @mermaid-js/mermaid-cli -i cOS_mindmap.md -o cOS_mindmap.png
-   ```
-   If no syntax errors exist, the tool outputs high-resolution PNG/SVG vector diagrams.
