@@ -2,7 +2,7 @@
 
 
 **Architecture**: 64-bit RISC-V (`rv64gc`) on QEMU `virt` machine  
-**Edition**: First Edition (Release 1.0)
+**Edition**: First Edition (Release 1.0) & Inspired from MIT xv6 Operating System
 ```
             /$$$$$$   /$$$$$$ 
            /$$__  $$ /$$__  $$
