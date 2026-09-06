@@ -1,6 +1,6 @@
 # cOS (Curiosity Operating System): The Comprehensive Systems Engineering Textbook
 
-**Author**: Kunal Kashyap 
+
 **Architecture**: 64-bit RISC-V (`rv64gc`) on QEMU `virt` machine  
 **Edition**: First Edition (Release 1.0)
 ```
