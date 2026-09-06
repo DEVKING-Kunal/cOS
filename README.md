@@ -71,6 +71,63 @@
 
 ---
 
+
+The diagram below illustrates the runtime interaction between the hardware, trap vectors, kernel subsystems, and user-space applications:
+
+```mermaid
+flowchart TD
+    subgraph UserSpace["User Space (Ring 3 / U-Mode)"]
+        App["User Application / Shell / testsyscall"]
+        UserStub["User Syscall Stub (e.g. procinfo in usys.S)"]
+        UserTrapframe["User Trapframe (Mapped at TRAPFRAME)"]
+    end
+
+    subgraph Trampoline["Dual-Mapped Trampoline (TRAMPOLINE: MAXVA - PGSIZE)"]
+        UVEC["uservec: Save Regs to Trapframe, Switch SATP to Kernel"]
+        URET["userret: Restore Regs from Trapframe, Switch SATP to User"]
+    end
+
+    subgraph KernelSpace["cOS Kernel Space (Ring 1 / S-Mode)"]
+        TrapHandler["usertrap() in trap.c"]
+        SyscallDispatcher["syscall() in syscall.c"]
+        
+        subgraph Subsystems["Core Kernel Subsystems"]
+            Boot["Boot Subsystem\n(entry.S, start.c, main.c)"]
+            Mem["Memory Subsystem\n(kalloc.c, vm.c, calc_rss)"]
+            Proc["Process & Scheduling\n(proc.c, swtch.S, scheduler)"]
+            SysProc["System Calls & Telemetry\n(sysproc.c: sys_procinfo)"]
+        end
+    end
+
+    subgraph Hardware["RISC-V Hardware Platform (QEMU virt)"]
+        CPU["RISC-V 64-bit Hart (M-Mode -> S-Mode)"]
+        MMU["Hardware MMU (Sv39 3-Level Paging)"]
+        UART["16550A UART Serial Controller"]
+        PLIC["Platform-Level Interrupt Controller"]
+        DRAM["Physical RAM (128 MB: KERNBASE to PHYSTOP)"]
+    end
+
+    %% Execution and Data Flows
+    CPU -->|1. Reset at 0x1000| Boot
+    Boot -->|2. Bring up Harts, Allocator, Page Tables| Mem
+    Boot -->|3. Initialize Process Table, Scheduler| Proc
+    
+    App -->|4. Invoke Syscall| UserStub
+    UserStub -->|5. ecall instruction| UVEC
+    UVEC -->|6. Switch SATP, jump| TrapHandler
+    TrapHandler -->|7. Decode scause == 8| SyscallDispatcher
+    SyscallDispatcher -->|8. Dispatch Syscall #23| SysProc
+    SysProc -->|9. Sv39 Walk to tally mapped physical pages| Mem
+    SysProc -->|10. Query process state & telemetry| Proc
+    SysProc -->|11. 5-arg copyout result to user buffer| App
+    TrapHandler -->|12. prepare_return| URET
+    URET -->|13. sret instruction| App
+
+    Mem <-->|Page Allocation / Free| DRAM
+    TrapHandler <-->|Device Interrupts| PLIC
+    Boot <-->|Console Boot Logs & Splash| UART
+```
+
 # Chapter 1: Introduction to cOS & Architectural Overview
 
 ### 1.1 What is cOS?
